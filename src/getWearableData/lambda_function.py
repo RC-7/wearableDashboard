@@ -57,7 +57,7 @@ def buildFilterExpression(requestValues):
 def lambda_handler(event, context):
     operation = event['httpMethod']
     # if operation is not "POST" : return respond(ValueError('Unsupported method "{}"'.format(operation)))
-    requestValues =  event['body']
+    requestValues =  json.loads(event['body'])
     fe = buildFilterExpression(requestValues)
     print(fe)
     responseBody = querryDB(fe, requestValues['columnValues'])
