@@ -7,7 +7,6 @@ DBTableName = 'wearableData'
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(DBTableName)
 
-
 def respond(body):
     return {
         'statusCode': '200',
@@ -29,24 +28,37 @@ def formatResponse (response, columns) :
     print("Formated dict", formattedDict)     
     return(formattedDict)
 
-
 def querryDB(fe, columnsToQuerry):
     response = table.scan(FilterExpression = eval(fe), ProjectionExpression = columnsToQuerry)
+    itemsInResponse = response['Items']
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(FilterExpression = eval(fe), ProjectionExpression = columnsToQuerry)
+        itemsInResponse.append(response['Items'])
     columnsArray = columnsToQuerry.replace(" ", "").split(',')
-    return formatResponse(response['Items'], columnsArray)
 
-    # build up a filter expression we will use in querryDB
+    return formatResponse(itemsInResponse, columnsArray)
+
+def activityTypeFilterEx(activity) :
+    return "Key('activityType').eq('" + activity +"')"
+def dateFilterEx(date):
+    dateArray = date.replace(" ", "").split(',')
+    return "Key('date').between('" + dateArray[0] + "','" +  dateArray[1] + "')"
+
 def buildFilterExpression(requestValues):
-    pass
+    fe = ""
+    filterableColumns = {"activityType": activityTypeFilterEx,
+    "date": dateFilterEx}
+    for key in requestValues:
+        if key in filterableColumns:
+            fe+=filterableColumns[key](requestValues[key])
+            fe += ' & '
+    return fe[:-2]
 
 def lambda_handler(event, context):
-
     operation = event['httpMethod']
     # if operation is not "POST" : return respond(ValueError('Unsupported method "{}"'.format(operation)))
     requestValues =  event['body']
-    fe = "Key('activityType').eq('running')"
     fe = buildFilterExpression(requestValues)
-    responseBody = querryActivity(fe, requestValues['columnValues'])
+    print(fe)
+    responseBody = querryDB(fe, requestValues['columnValues'])
     return respond(responseBody)
-
-    

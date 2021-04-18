@@ -1,4 +1,3 @@
-
 import pandas as pd
 import json
 import urllib.parse
@@ -73,12 +72,6 @@ def deleteS3Object(event) :
 
 # if __name__ == "__main__":
 #     main()
-
-
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-
-
 
 def lambda_handler(event, context):
     df = readS3EventToDf(event)
