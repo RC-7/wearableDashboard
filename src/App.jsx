@@ -1,12 +1,9 @@
 import React from 'react';
-// import logo from './logo.svg';
 import './App.css';
 import VerticalBarGraph from '@chartiful/react-vertical-bar-graph';
 import axios from "axios";
 import Select from 'react-select'
 
-// const https = require('https');
-// var exec = require('child_process').exec;
 const activities =[
   {value: 'all', label: 'all'},
   {value: 'boating', label: 'boating'},
@@ -51,6 +48,8 @@ const deaultColumns = [{value: 'vo2Max', label: 'vo2Max'},
   {value: 'CL', label: 'CL'}
 ];
 
+const defaultActivity = [{value: 'all', label: 'all'},]
+
 const HEADERS = {headers: {
   "x-api-key":"x-api-key",
   "Content-Type": "application/json",
@@ -64,13 +63,15 @@ class App extends React.Component {
 
     constructor(props){
       super(props)
-      this.state = { // Tie all state to what we display and then allow button press to set default values for different activities
+      let todayDate = new Date()
+      this.state = {
         data: [10,0,-2.5,540],
-        selectedActivities: [],
+        selectedActivities: ['all'],
         selectedColumns: 'AL, CL, vo2Max',
-        dateLower : "2018-03-11",
-        dateUpper: "2021-03-22",
-        dataFromAPI: {}
+        dateLower : `${todayDate.getFullYear()}-${('0' + todayDate.getMonth()).slice()}-${todayDate.getDate()}`,
+        dateUpper: new Date().toISOString().slice(0, 10),
+        dataFromAPI: {},
+        noDataText: ""
       };
     }
 
@@ -84,11 +85,16 @@ class App extends React.Component {
         headers: {
           "x-api-key":"P20NOZjnTP20YCT1WsKAb9pG8o3oVHj25kHK62N1",
           "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*",
         }
       }
     ).then((res) => {
-        this.setState({dataFromAPI: res.data})
+      console.log(res.data[Object.keys(res.data)[0]])
+      if (res.data[Object.keys(res.data)[0]].length > 0){
+        this.setState({dataFromAPI: res.data, noDataText: ""})
+      } else {
+        this.setState({dataFromAPI: {}, noDataText: "No data for date range selected"})
+      }
+      
       })
       .catch((err) => {
         console.log("AXIOS ERROR: ", err);
@@ -106,10 +112,8 @@ class App extends React.Component {
     handleChange = (e) => {
       let activities = []
       for (var activity in e){
-        // console.log(activity)
         activities.push(e[activity].value)
       }
-      // console.log(activities)
       this.setState({selectedActivities: activities})
     }
 
@@ -122,75 +126,72 @@ class App extends React.Component {
     }
 
     handleChangeColumn = (e) => {
-      // console.log(e)
       let columns = ""
       for (var column in e){
         columns += (e[column].value)
       }
-      // console.log(columns)
       this.setState({selectedColumns: columns})
     }
 
-    generateGraph(data){
-
-      const config = {
-        // startAtZero: false,
-        // hasXAxisBackgroundLines: false,
-        // hasXAxisLabels: false,
-        // xAxisLabelStyle: {
-        //   prefix: '$',
-        //   offset: 0
-        // }
-      };
+    generateGraph(data, title){
+      let height = window.screen.height *0.5
+      let width = window.screen.width*0.7
       return (
+        <div>
+        <h2 class = 'graph'>{title}</h2>
         <VerticalBarGraph 
-        width={500}
-        height={300}
+        width={width}
+        height={height}
         data={data}
-        // labels={[]}
         hasXAxisLabels={false}
-        baseConfig={config}
         style={{
         marginBottom: 30,
         padding: 10,
         paddingTop: 20,
         borderRadius: 20,
-        // width: 500,
         backgroundColor: `#dbf0ef`
       }}
       
       />
+      </div>
       )
     }
   
     render() {
       // console.log(this.state);
-      let {dataFromAPI} = this.state;
+      let {dataFromAPI, noDataText} = this.state;
       let graphs = []
       for (var key in dataFromAPI){
-        graphs.push(this.generateGraph(dataFromAPI[key]))
+        graphs.push(this.generateGraph(dataFromAPI[key], key))
       }
       return (
         <>
-          <button onClick={this.handleClick}>Say something</button>
-          <div>{this.state.mssg}</div>
-          <br/>
+        
+        <div class="card">
+        <h1>Wearable metrics dashboard</h1>
+          <h2>Activity</h2>
           <Select 
-          isMulti
+          // isMulti
           width='200px'
+          marginBottom="10px"
+          classNamePrefix="mySelect"
           options={activities} 
+          defaultValue={defaultActivity}
           onChange={this.handleChange}/>
-
+          <h2 >Metrics to view</h2>
         <Select 
           isMulti
-          width='200px'
+          width='20px'
+          marginBottom="10px"
           options={columns} 
           defaultValue={deaultColumns}
           onChange={this.handleChangeColumn}/>
+        <h2>Date rage</h2>
+          <input type="text" class = "dateSelector" value={this.state.dateLower} padding = '10px' onChange={this.handleChangeLower} />
+          <span>to</span>
+          <input type="text" class = "dateSelector" value={this.state.dateUpper} onChange={this.handleChangeUpper} />
 
-          <input type="text" value={this.state.dateLower} onChange={this.handleChangeLower} />
-
-          <input type="text" value={this.state.dateUpper} onChange={this.handleChangeUpper} />
+          <button onClick={this.handleClick}>Get results</button>
 
           <div className="App">
       {/* <LineGraph 
@@ -208,8 +209,12 @@ class App extends React.Component {
       /> */}
 
       <div/>
+      <span>
+      {noDataText}
+      </span>
       {graphs}
       
+    </div>
     </div>
         </>
       );
