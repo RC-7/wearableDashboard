@@ -64,15 +64,6 @@ def deleteS3Object(event) :
         print('Error deleting object {} from bucket {} after ingesting to Dynamo DB storage.'.format(key, bucket))
         raise e
 
-# def main():
-#     df = pd.read_csv('data/data.csv')
-#     df.dropna(inplace = True)
-#     # print(df.dtypes) 
-#     print(Decimal(((df.iloc[0]['duration'])))) 
-
-# if __name__ == "__main__":
-#     main()
-
 def lambda_handler(event, context):
     df = readS3EventToDf(event)
     cleanDf(df)

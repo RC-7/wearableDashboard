@@ -57,8 +57,6 @@ const HEADERS = {headers: {
 }}
 const ENDPOINT = "https://27k379fu03.execute-api.eu-west-1.amazonaws.com/prod/getWearableData"
 
-const DEFAULT_QUERRY = {"activityType": "running","date": "2021-03-13,2021-03-22","columnValues": "AL, CL"}
-
 class App extends React.Component {
 
     constructor(props){
@@ -66,7 +64,7 @@ class App extends React.Component {
       let todayDate = new Date()
       this.state = {
         data: [10,0,-2.5,540],
-        selectedActivities: ['all'],
+        selectedActivity: 'all',
         selectedColumns: 'AL, CL, vo2Max',
         dateLower : `${todayDate.getFullYear()}-${('0' + todayDate.getMonth()).slice()}-${todayDate.getDate()}`,
         dateUpper: new Date().toISOString().slice(0, 10),
@@ -88,7 +86,6 @@ class App extends React.Component {
         }
       }
     ).then((res) => {
-      console.log(res.data[Object.keys(res.data)[0]])
       if (res.data[Object.keys(res.data)[0]].length > 0){
         this.setState({dataFromAPI: res.data, noDataText: ""})
       } else {
@@ -101,27 +98,27 @@ class App extends React.Component {
       })
     }
 
-    handleClick = () => {
+    handleRequestData = () => {
 
-      let {selectedActivities, dateLower, dateUpper, selectedColumns } = this.state
-      for (var selectedActivity in selectedActivities){
-        this.querryAPI(selectedActivities[selectedActivity], `${dateLower}, ${dateUpper}`, selectedColumns)
-      }
+      let {selectedActivity, dateLower, dateUpper, selectedColumns } = this.state
+      
+      this.querryAPI(selectedActivity, `${dateLower}, ${dateUpper}`, selectedColumns)
 
     };
-    handleChange = (e) => {
+    handleActivitySelect = (e) => {
       let activities = []
+      console.log(e.value)
       for (var activity in e){
         activities.push(e[activity].value)
       }
-      this.setState({selectedActivities: activities})
+      this.setState({selectedActivity: e.value})
     }
 
-    handleChangeLower = (e) => {
+    handleChangeLowerDate = (e) => {
       this.setState({dateLower: e.target.value});
     }
 
-    handleChangeUpper = (e) => {
+    handleChangeUpperDate = (e) => {
       this.setState({dateUpper: e.target.value});
     }
 
@@ -158,7 +155,7 @@ class App extends React.Component {
     }
   
     render() {
-      // console.log(this.state);
+      console.log(this.state.selectedActivity)
       let {dataFromAPI, noDataText} = this.state;
       let graphs = []
       for (var key in dataFromAPI){
@@ -166,56 +163,36 @@ class App extends React.Component {
       }
       return (
         <>
-        
         <div class="card">
-        <h1>Wearable metrics dashboard</h1>
-          <h2>Activity</h2>
-          <Select 
-          // isMulti
-          width='200px'
-          marginBottom="10px"
-          classNamePrefix="mySelect"
-          options={activities} 
-          defaultValue={defaultActivity}
-          onChange={this.handleChange}/>
-          <h2 >Metrics to view</h2>
-        <Select 
-          isMulti
-          width='20px'
-          marginBottom="10px"
-          options={columns} 
-          defaultValue={deaultColumns}
-          onChange={this.handleChangeColumn}/>
-        <h2>Date rage</h2>
-          <input type="text" class = "dateSelector" value={this.state.dateLower} padding = '10px' onChange={this.handleChangeLower} />
-          <span>to</span>
-          <input type="text" class = "dateSelector" value={this.state.dateUpper} onChange={this.handleChangeUpper} />
-
-          <button onClick={this.handleClick}>Get results</button>
-
-          <div className="App">
-      {/* <LineGraph 
-      width={500}
-      height={300}
-      data={this.state.data}
-      style={{
-        marginBottom: 30,
-        padding: 10,
-        paddingTop: 20,
-        borderRadius: 20,
-        width: 500,
-        backgroundColor: `#dbf0ef`
-      }}
-      /> */}
-
-      <div/>
-      <span>
-      {noDataText}
-      </span>
-      {graphs}
-      
-    </div>
-    </div>
+           <h1>Wearable metrics dashboard</h1>
+           <h2>Activity</h2>
+           <Select 
+              width='200px'
+              marginBottom="10px"
+              classNamePrefix="mySelect"
+              options={activities} 
+              defaultValue={defaultActivity}
+              onChange={this.handleActivitySelect}/>
+           <h2 >Metrics to view</h2>
+           <Select 
+              isMulti
+              width='20px'
+              marginBottom="10px"
+              options={columns} 
+              defaultValue={deaultColumns}
+              onChange={this.handleChangeColumn}/>
+           <h2>Date rage</h2>
+           <input type="text" class = "dateSelector" value={this.state.dateLower} padding = '10px' onChange={this.handleChangeLowerDate} />
+           <span>to</span>
+           <input type="text" class = "dateSelector" value={this.state.dateUpper} onChange={this.handleChangeUpperDate} />
+           <button onClick={this.handleRequestData}>Get results</button>
+           <div>
+              <span>
+              {noDataText}
+              </span>
+           </div>
+           {graphs}
+        </div>
         </>
       );
     }
