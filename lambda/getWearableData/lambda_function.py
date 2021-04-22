@@ -29,7 +29,7 @@ def formatResponse (response, columns) :
     for columnValue in response:
         for column in columns: 
             formattedDict[column].append(float(Decimal(columnValue[column])) 
-            if isinstance(Decimal(columnValue[column]),Decimal)  
+            if isinstance(columnValue[column],Decimal)  
             else columnValue[column])
     print("Formated dict", formattedDict)     
     return(formattedDict)
