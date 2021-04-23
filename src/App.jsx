@@ -125,8 +125,9 @@ class App extends React.Component {
     handleChangeColumn = (e) => {
       let columns = ""
       for (var column in e){
-        columns += (e[column].value)
+        columns += (e[column].value) + ' , '
       }
+      columns =columns.slice(0,-2)
       this.setState({selectedColumns: columns})
     }
 
