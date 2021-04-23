@@ -4,6 +4,10 @@ background-color: #cccccc;
 }
 @import url('https://rsms.me/inter/inter.css');
 
+p {
+  color: red;
+}
+
 :root {
   --color-light: white;
   --color-dark: #212121;
