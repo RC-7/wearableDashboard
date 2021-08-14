@@ -1,7 +1,5 @@
 # Wearable metric dashboard
 
-Website can be access [here](https://main.d2ewd5v9ij08do.amplifyapp.com/)
-
 Note that there is no data for the last month, data starts from: `2021-03-21`
 
 ### Overview diagram:
