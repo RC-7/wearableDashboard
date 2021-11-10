@@ -48,7 +48,7 @@ const deaultColumns = [{value: 'vo2Max', label: 'vo2Max'},
 const defaultActivity = [{value: 'all', label: 'all'},]
 
 const dateRegex = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/g;
-const ENDPOINT = "https://27k379fu03.execute-api.eu-west-1.amazonaws.com/prod/getWearableData"
+const ENDPOINT = "https://API_endpoint"
 
 class App extends React.Component {
 
@@ -75,7 +75,7 @@ class App extends React.Component {
       if (activityType !== 'all') querry['activityType'] = activityType
       axios.post(ENDPOINT, querry, {
         headers: {
-          "x-api-key":"P20NOZjnTP20YCT1WsKAb9pG8o3oVHj25kHK62N1",
+          "x-api-key":"API_key",
           "Content-Type": "application/json",
         }
       }
