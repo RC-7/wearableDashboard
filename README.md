@@ -25,7 +25,7 @@ Note that there is no data for the last month, data starts from: `2021-03-21`
 - `lambda` directory contains the lambda code (python) used to ingest and querry data
   - getWearableData is the lambda function connected to an API. This API is used to querry data stored in Dynamo DB. The API uses AWS Api Gateway to allow the lambda to be hit. We can provide the API with a date range to querry and the columnValues/metrics that we want to view. 
   - An example curl and response used to hit the API is:
-    - `curl -X POST -H "x-api-key:P20NOZjnTP20YCT1WsKAb9pG8o3oVHj25kHK62N1" -H "Content-Type: application/json" https://27k379fu03.execute-api.eu-west-1.amazonaws.com/prod/getWearableData -d "{\"date\": \"2021-03-13,2021-03-19\",\"columnValues\": \"AL, CL\"}"`
+    - `curl -X POST -H "x-api-key:API_Key" -H "Content-Type: application/json" Endpoint_URL a -d "{\"date\": \"2021-03-13,2021-03-19\",\"columnValues\": \"AL, CL\"}"`
     - `{"AL": [39.8242486030958, 40.951995846465, 46.3475261987231, 36.3846603062292, 38.1569252846543], "CL": [36.2065369428448, 36.8012046612011, 37.461086631596, 35.6837346645221, 36.4048584265747]}`
   - ingestionLambda is the lambda used to batch ingest data to Dynamo DB from a file/object placed in an S3 bucket.
 - The rest of the repo is oriented towards the website. View App.jsx for the react code driving the website.
